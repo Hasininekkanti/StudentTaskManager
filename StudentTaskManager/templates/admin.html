@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Admin Dashboard - Student Task Manager</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body class="dashboard-page">
+
+    <!-- TOP NAVIGATION -->
+
+    <header class="topbar">
+
+        <div class="brand">
+
+            <div class="brand-icon">
+                ✓
+            </div>
+
+            <div>
+                <h1>Student Task Manager</h1>
+                <span>Admin Dashboard</span>
+            </div>
+
+        </div>
+
+
+        <div class="user-section">
+
+            <span class="welcome">
+                Welcome, <strong>{{ session["username"] }}</strong>
+            </span>
+
+            <a href="{{ url_for('logout') }}"
+               class="logout-btn">
+                Logout
+            </a>
+
+        </div>
+
+    </header>
+
+
+    <main class="dashboard-container">
+
+
+        <!-- ADMIN HEADING -->
+
+        <section class="dashboard-heading">
+
+            <div>
+
+                <h2>Admin Dashboard</h2>
+
+                <p>
+                    Manage users and monitor all student tasks
+                </p>
+
+            </div>
+
+        </section>
+
+
+        <!-- SUMMARY CARDS -->
+
+        <section class="admin-stats">
+
+            <div class="stat-card">
+
+                <div class="stat-icon">
+                    👥
+                </div>
+
+                <div>
+                    <span>Total Users</span>
+                    <strong>{{ users|length }}</strong>
+                </div>
+
+            </div>
+
+
+            <div class="stat-card">
+
+                <div class="stat-icon">
+                    📋
+                </div>
+
+                <div>
+                    <span>Total Tasks</span>
+
+                    <strong>
+                        {{ records|length }}
+                    </strong>
+
+                </div>
+
+            </div>
+
+
+            <div class="stat-card">
+
+                <div class="stat-icon">
+                    ✓
+                </div>
+
+                <div>
+                    <span>Completed</span>
+
+                    <strong>
+                        {{ records|selectattr("completed", "equalto", 1)|list|length }}
+                    </strong>
+
+                </div>
+
+            </div>
+
+
+            <div class="stat-card">
+
+                <div class="stat-icon">
+                    ●
+                </div>
+
+                <div>
+                    <span>Pending</span>
+
+                    <strong>
+                        {{ records|selectattr("completed", "equalto", 0)|list|length }}
+                    </strong>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- USERS -->
+
+        <section class="admin-section">
+
+            <div class="section-header">
+
+                <div>
+
+                    <h2>Registered Users</h2>
+
+                    <p>
+                        All users registered in the system
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <div class="user-grid">
+
+                {% for u in users %}
+
+                <div class="user-card">
+
+                    <div class="user-avatar">
+                        {{ u.username[0]|upper }}
+                    </div>
+
+
+                    <div class="user-info">
+
+                        <h3>
+                            {{ u.username }}
+                        </h3>
+
+                        <span class="role-badge">
+                            {{ u.role }}
+                        </span>
+
+                    </div>
+
+
+                    <div class="user-stats">
+
+                        <div>
+                            <strong>
+                                {{ u.total_tasks or 0 }}
+                            </strong>
+
+                            <span>
+                                Tasks
+                            </span>
+                        </div>
+
+
+                        <div>
+                            <strong>
+                                {{ u.completed_tasks or 0 }}
+                            </strong>
+
+                            <span>
+                                Completed
+                            </span>
+                        </div>
+
+                    </div>
+
+                </div>
+
+                {% endfor %}
+
+            </div>
+
+        </section>
+
+
+        <!-- ALL TASKS -->
+
+        <section class="admin-section">
+
+            <div class="section-header">
+
+                <div>
+
+                    <h2>All Task Records</h2>
+
+                    <p>
+                        Monitor tasks created by all students
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <div class="admin-task-grid">
+
+                {% for r in records %}
+
+                <article class="admin-task-card">
+
+
+                    <div class="admin-task-top">
+
+                        <div class="student-name">
+
+                            <div class="small-avatar">
+                                {{ r.username[0]|upper }}
+                            </div>
+
+                            <strong>
+                                {{ r.username }}
+                            </strong>
+
+                        </div>
+
+
+                        {% if r.completed %}
+
+                        <span class="status completed">
+                            ✓ Completed
+                        </span>
+
+                        {% else %}
+
+                        <span class="status pending">
+                            ● Pending
+                        </span>
+
+                        {% endif %}
+
+                    </div>
+
+
+                    <div class="admin-task-content">
+
+                        <h3>
+                            {{ r.title }}
+                        </h3>
+
+                    </div>
+
+
+                    <div class="admin-task-bottom">
+
+                        {% if r.priority == "High" %}
+
+                        <span class="priority-badge high-badge">
+                            High Priority
+                        </span>
+
+                        {% elif r.priority == "Medium" %}
+
+                        <span class="priority-badge medium-badge">
+                            Medium Priority
+                        </span>
+
+                        {% else %}
+
+                        <span class="priority-badge low-badge">
+                            Low Priority
+                        </span>
+
+                        {% endif %}
+
+                    </div>
+
+                </article>
+
+                {% else %}
+
+                <div class="empty-state">
+
+                    <div class="empty-icon">
+                        ✓
+                    </div>
+
+                    <h3>No Tasks Found</h3>
+
+                    <p>
+                        Students have not created any tasks yet.
+                    </p>
+
+                </div>
+
+                {% endfor %}
+
+            </div>
+
+        </section>
+
+    </main>
+
+</body>
+</html>

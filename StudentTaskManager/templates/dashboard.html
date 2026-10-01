@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Student Task Manager</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body class="dashboard-page">
+
+    <!-- TOP NAVIGATION -->
+    <header class="topbar">
+
+        <div class="brand">
+            <div class="brand-icon">✓</div>
+
+            <div>
+                <h1>Student Task Manager</h1>
+                <span>Personal Task Dashboard</span>
+            </div>
+        </div>
+
+        <div class="user-section">
+            <span class="welcome">
+                Welcome, <strong>{{ session["username"] }}</strong>
+            </span>
+
+            <a href="{{ url_for('logout') }}" class="logout-btn">
+                Logout
+            </a>
+        </div>
+
+    </header>
+
+
+    <main class="dashboard-container">
+
+
+        <!-- PAGE TITLE -->
+
+        <section class="dashboard-heading">
+
+            <div>
+                <h2>My Tasks</h2>
+
+                <p>
+                    Create, organize and track your tasks
+                </p>
+            </div>
+
+        </section>
+
+
+        <!-- ADD TASK CARD -->
+
+        <section class="add-task-card">
+
+            <div class="add-task-title">
+
+                <div class="add-icon">+</div>
+
+                <div>
+                    <h2>Add New Task</h2>
+                    <p>Create a task and set its priority</p>
+                </div>
+
+            </div>
+
+
+            <form action="{{ url_for('add_task') }}"
+                  method="POST"
+                  class="task-form">
+
+                <div class="input-group">
+
+                    <label>Task</label>
+
+                    <input
+                        type="text"
+                        name="title"
+                        placeholder="What do you need to accomplish?"
+                        required
+                    >
+
+                </div>
+
+
+                <div class="input-group priority-input">
+
+                    <label>Priority</label>
+
+                    <select name="priority">
+
+                        <option value="High">
+                            High Priority
+                        </option>
+
+                        <option value="Medium">
+                            Medium Priority
+                        </option>
+
+                        <option value="Low">
+                            Low Priority
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <button type="submit" class="add-btn">
+                    + Add Task
+                </button>
+
+            </form>
+
+        </section>
+
+
+        <!-- TASK SECTION -->
+
+        <section class="tasks-section">
+
+            <div class="section-header">
+
+                <div>
+                    <h2>Your Tasks</h2>
+
+                    <p>
+                        {% if tasks %}
+                            {{ tasks|length }} task(s)
+                        {% else %}
+                            No tasks yet
+                        {% endif %}
+                    </p>
+                </div>
+
+            </div>
+
+
+            <!-- TASK GRID -->
+
+            <div class="task-grid">
+
+                {% for t in tasks %}
+
+                <article class="task-card priority-{{ t.priority|lower }}">
+
+                    <!-- PRIORITY -->
+
+                    <div class="task-top">
+
+                        <span class="priority-badge">
+                            {{ t.priority }} Priority
+                        </span>
+
+                        {% if t.completed %}
+
+                            <span class="status completed">
+                                ✓ Completed
+                            </span>
+
+                        {% else %}
+
+                            <span class="status pending">
+                                ● Pending
+                            </span>
+
+                        {% endif %}
+
+                    </div>
+
+
+                    <!-- TASK CONTENT -->
+
+                    <div class="task-content">
+
+                        <h3>
+                            {{ t.title }}
+                        </h3>
+
+                    </div>
+
+
+                    <!-- TASK ACTIONS -->
+
+                    <div class="task-actions">
+
+                        {% if not t.completed %}
+
+                        <a
+                            href="{{ url_for('complete_task', task_id=t.id) }}"
+                            class="complete-btn"
+                        >
+                            ✓ Mark Complete
+                        </a>
+
+                        {% endif %}
+
+
+                        <a
+                            href="{{ url_for('delete_task', task_id=t.id) }}"
+                            class="delete-btn"
+                        >
+                            Delete
+                        </a>
+
+                    </div>
+
+                </article>
+
+                {% else %}
+
+                <!-- EMPTY STATE -->
+
+                <div class="empty-state">
+
+                    <div class="empty-icon">
+                        ✓
+                    </div>
+
+                    <h3>No Tasks Yet</h3>
+
+                    <p>
+                        Add your first task using the form above.
+                    </p>
+
+                </div>
+
+                {% endfor %}
+
+            </div>
+
+        </section>
+
+    </main>
+
+</body>
+</html>
